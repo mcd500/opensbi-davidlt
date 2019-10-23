@@ -85,6 +85,7 @@ fw_options:
 	add	a0, zero, zero
 	ret
 
+.option norelax
 #ifdef FW_PAYLOAD_FDT_PATH
 	.align 4
 	.section .text, "ax", %progbits
