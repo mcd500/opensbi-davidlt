@@ -43,9 +43,6 @@
 #define VIC7100_RESET_DOUT_ADDR			(VIC7100_FULLMUX_BASE_ADDR + 0x248)
 #define VIC7100_RESET_DOEN_ADDR			(VIC7100_FULLMUX_BASE_ADDR + 0x24C)
 
-/* Full tlb flush always */
-#define VIC7100_TLB_RANGE_FLUSH_LIMIT		0
-
 /* Example for future use */
 enum sbi_ext_starfive_fid {
 	SBI_EXT_STARFIVE_RDTIME = 0,
@@ -84,13 +81,6 @@ static void vic7100_modify_dt(void *fdt)
 	fdt_cpu_fixup(fdt);
 
 	fdt_fixups(fdt);
-
-	/*
-	 * SiFive Freedom U540 has an erratum that prevents S-mode software
-	 * to access a PMP protected region using 1GB page table mapping, so
-	 * always add the no-map attribute on this platform.
-	 */
-	fdt_reserved_memory_nomap_fixup(fdt);
 }
 
 static int vic7100_final_init(bool cold_boot)
@@ -139,11 +129,6 @@ static int vic7100_ipi_init(bool cold_boot)
 	}
 
 	return clint_warm_ipi_init();
-}
-
-static u64 vic7100_get_tlbr_flush_limit(void)
-{
-	return VIC7100_TLB_RANGE_FLUSH_LIMIT;
 }
 
 static int vic7100_timer_init(bool cold_boot)
@@ -234,7 +219,6 @@ const struct sbi_platform_operations platform_ops = {
 	.ipi_send		= clint_ipi_send,
 	.ipi_clear		= clint_ipi_clear,
 	.ipi_init		= vic7100_ipi_init,
-	.get_tlbr_flush_limit	= vic7100_get_tlbr_flush_limit,
 	.timer_value		= clint_timer_value,
 	.timer_event_stop	= clint_timer_event_stop,
 	.timer_event_start	= clint_timer_event_start,
